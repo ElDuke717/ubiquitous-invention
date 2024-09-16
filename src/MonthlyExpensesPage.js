@@ -119,16 +119,20 @@ function MonthlyExpensesPage({ categories }) {
 
   // Function to delete the expense
   const handleDeleteExpense = (id) => {
-    axios
-      .delete(`http://localhost:5001/individual-expenses/${id}`)
-      .then((response) => {
-        // Refresh the expenses after successful delete
-        const updatedExpenses = monthlyExpenses.filter(
-          (expense) => expense.id !== id
-        );
-        setMonthlyExpenses(updatedExpenses);
-      })
-      .catch((error) => console.error(error));
+    const confirmed = window.confirm("Are you sure you want to delete this expense?");
+    
+    if (confirmed) {
+      axios
+        .delete(`http://localhost:5001/individual-expenses/${id}`)
+        .then((response) => {
+          // Refresh the expenses after successful delete
+          const updatedExpenses = monthlyExpenses.filter(
+            (expense) => expense.id !== id
+          );
+          setMonthlyExpenses(updatedExpenses);
+        })
+        .catch((error) => console.error(error));
+    }
   };
 
   // Helper function to convert a date from YYYY-MM-DD to DD-MM-YYYY
@@ -173,6 +177,7 @@ function MonthlyExpensesPage({ categories }) {
           ))}
         </tbody>
       </table>
+      {/* Detailed Expenses List */}
       <h3 className="text-xl font-bold mt-10 mb-5">Detailed Expenses</h3>
       <table className="min-w-full bg-white shadow-md rounded">
         <thead>
@@ -200,19 +205,21 @@ function MonthlyExpensesPage({ categories }) {
               </td>
               <td className="py-2 px-4 border-b">{expense.description}</td>
               <td className="py-2 px-4 border-b">
+            <div className="flex flex-col space-y-2">
                 <button
-                  onClick={() => handleEditClick(expense)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                onClick={() => handleEditClick(expense)}
+                className="bg-blue-500 text-white w-full py-2 rounded"
                 >
-                  Edit
+                Edit
                 </button>
                 <button
-                  onClick={() => handleDeleteExpense(expense.id)}
-                  className="bg-red-500 text-white px-4 py-2 rounded ml-2"
+                onClick={() => handleDeleteExpense(expense.id)}
+                className="bg-red-500 text-white w-full py-2 rounded"
                 >
-                  Delete
+                Delete
                 </button>
-              </td>
+            </div>
+            </td>
             </tr>
           ))}
         </tbody>

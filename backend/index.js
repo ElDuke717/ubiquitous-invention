@@ -11,19 +11,20 @@ const db = require("./database");
 
 // Initialize the database
 db.serialize(() => {
-    
-    // Create the expenses table with the corrected schema
-    db.run(`
-      CREATE TABLE IF NOT EXISTS expenses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        category TEXT NOT NULL,
-        subcategory TEXT NOT NULL,
-        amount REAL NOT NULL,
-        vendor TEXT NOT NULL,
-        date TEXT NOT NULL
-      )
-    `);
+  
+
+  // Create the expenses table with the corrected schema
+  db.run(`
+    CREATE TABLE IF NOT EXISTS expenses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      category TEXT NOT NULL,
+      subcategory TEXT NOT NULL,
+      amount REAL NOT NULL
+    )
+  `);
+
   // Create the individual_expenses table
+  db.run(`DROP TABLE IF EXISTS individual_expenses`);
   db.run(`
     CREATE TABLE IF NOT EXISTS individual_expenses (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,30 +70,35 @@ db.serialize(() => {
 
 // backend/index.js
 // this is used by ExpenseEntryForm
-app.post("/expense", (req, res) => {
+// Route to add budgeted expenses
+app.post("/expenses", (req, res) => {
   const expenses = req.body; // Expecting an array of expense objects
 
-  const stmt = db.prepare(`
-      INSERT INTO expenses (category, subcategory, amount, vendor, date)
-      VALUES (?, ?, ?, ?)
-    `);
-
   db.serialize(() => {
-    db.run("BEGIN TRANSACTION");
-    expenses.forEach((expense) => {
-      stmt.run(
-        expense.category,
-        expense.subcategory,
-        expense.amount,
-        expense.vendor,
-        expense.date || new Date().toISOString()
-      );
-    });
-    db.run("COMMIT");
-    stmt.finalize();
-  });
+    // Delete existing expenses (since you're overwriting)
+    db.run("DELETE FROM expenses", [], function (err) {
+      if (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+        return;
+      }
 
-  res.json({ message: "Expenses saved successfully" });
+      // Prepare the statement
+      const stmt = db.prepare(`
+          INSERT INTO expenses (category, subcategory, amount)
+          VALUES (?, ?, ?)
+        `);
+
+      db.run("BEGIN TRANSACTION");
+      expenses.forEach((expense) => {
+        stmt.run(expense.category, expense.subcategory, expense.amount);
+      });
+      db.run("COMMIT");
+      stmt.finalize();
+
+      res.json({ message: "Expenses saved successfully" });
+    });
+  });
 });
 
 // Get all expenses - used by MonthlyExpensesPage to get all of the expenses
@@ -120,15 +126,16 @@ app.post("/individual-expenses", (req, res) => {
 
   // Insert the new expense into the database
   const sql = `
-        INSERT INTO individual_expenses (amount, vendor, date, category, subcategory, description)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `;
+      INSERT INTO individual_expenses (amount, vendor, date, category, subcategory, description)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
 
   db.run(
     sql,
     [amount, vendor, date, category, subcategory, description],
     function (err) {
       if (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
       } else {
         res.json({ message: "Expense added successfully!", id: this.lastID });

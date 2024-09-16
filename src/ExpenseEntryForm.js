@@ -36,7 +36,7 @@ function ExpenseEntryForm({ categories }) {
 
     // Send expense data to backend
     axios
-      .post("http://localhost:5001/expense", expense)
+      .post("http://localhost:5001/individual-expenses", expense)
       .then((response) => {
         alert("Expense added successfully!");
         // Reset the form

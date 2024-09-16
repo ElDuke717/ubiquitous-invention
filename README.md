@@ -1,70 +1,171 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+# Home Budgeting Application
 
-In the project directory, you can run:
+A web-based application designed to help users manage their household expenses, track budgets, and analyze financial trends with graphical representations.
 
-### `npm start`
+## Table of Contents
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+  
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Features
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Budget Tracking**: Add, edit, and delete budgeted expenses across various categories.
+- **Expense Tracking**: Track actual expenses and compare them with budgeted amounts.
+- **Graphs & Visualizations**: Visualize monthly and annual expenses with graphical representation.
+- **Expense Management**: Add and edit individual expenses, and delete them with a confirmation dialog.
+- **Journal & Credit Management**: Keep track of personal finance-related journal entries and manage credit cards.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Technologies Used
 
-### `npm run build`
+### Frontend:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **React**: JavaScript framework for building the user interface.
+- **TailwindCSS**: For responsive and modern styling.
+- **React Router**: For handling client-side routing.
+- **Axios**: For making HTTP requests to the backend API.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Backend:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Express.js**: Backend framework for building the API.
+- **SQLite**: Lightweight database to store budget and expense information.
+- **Node.js**: JavaScript runtime for the backend server.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Installation
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Prerequisites:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Node.js** (>=14.x)
+- **npm** or **yarn**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Steps:
 
-## Learn More
+1. **Clone the repository**:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   ```bash
+   git clone https://github.com/your-username/home-budgeting-app.git
+   cd home-budgeting-app
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. **Install dependencies for both frontend and backend**:
 
-### Code Splitting
+   ```bash
+   # Install frontend dependencies
+   cd frontend
+   npm install
+   # or
+   yarn install
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   # Install backend dependencies
+   cd ../backend
+   npm install
+   # or
+   yarn install
+   ```
 
-### Analyzing the Bundle Size
+3. **Set up the database**:
+   Ensure SQLite is properly configured. The application will automatically create tables upon starting the backend.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+4. **Start the backend server**:
 
-### Making a Progressive Web App
+   ```bash
+   cd backend
+   npm start
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+   This will start the server on `http://localhost:5001`.
 
-### Advanced Configuration
+5. **Start the frontend server**:
+   ```bash
+   cd ../frontend
+   npm start
+   ```
+   This will start the React application on `http://localhost:3000`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+1. **Homepage**: View and edit budgeted expenses across various categories.
+2. **Add Expense**: Manually add expenses to track actual spending.
+3. **Monthly Expenses**: View a breakdown of actual vs. budgeted expenses.
+4. **Journal**: Add personal finance-related notes and journal entries.
+5. **Credit Card Management**: Manage and track credit card details.
+6. **Graphs**: View graphical representations of monthly and annual expenses.
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## API Endpoints
+
+### Budgeted Expenses
+
+- **GET** `/expenses`: Fetch all budgeted expenses.
+- **POST** `/expenses`: Add or update budgeted expenses.
+
+### Individual Expenses
+
+- **GET** `/individual-expenses`: Fetch actual expenses.
+- **POST** `/individual-expenses`: Add an actual expense.
+- **PUT** `/individual-expenses/:id`: Edit an existing actual expense.
+- **DELETE** `/individual-expenses/:id`: Delete an actual expense.
+
+### Other Endpoints
+
+- **/journal**: Manage journal entries.
+- **/credit-cards**: Manage credit card data.
+
+---
+
+## Project Structure
+
+```
+home-budgeting-app/
+│
+├── frontend/         # React frontend
+│   ├── src/          # Source code for the frontend
+│   └── public/       # Static assets
+│
+├── backend/          # Express backend
+│   ├── index.js      # Main backend server file
+│   └── database.js   # Database connection and initialization
+│
+└── README.md         # This file
+```
+
+---
+
+## Contributing
+
+1. **Fork** the repository.
+2. **Create a branch** for your feature:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. **Commit** your changes:
+   ```bash
+   git commit -m "Added new feature"
+   ```
+4. **Push** to your forked repository:
+   ```bash
+   git push origin feature-name
+   ```
+5. Create a **Pull Request**.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+

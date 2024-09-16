@@ -184,7 +184,7 @@ function App() {
                   to="/"
                   className="text-gray-800 text-xl font-bold py-5 block"
                 >
-                  Home Budgeting Application
+                  Home Budgeting Application Home
                 </Link>
               </div>
               <div className="flex space-x-4">
@@ -281,12 +281,12 @@ function App() {
                       </button>
                     </div>
                     <div className="mt-10">
-                      <h3>Monthly Expenses: {`$${monthlyTotal}`}</h3>
+                      <h3>Monthly Expenses: {`$${monthlyTotal.toFixed(2)}`}</h3>
                       <MonthlyExpensesGraph
                         expenses={expenses}
                         actualExpenses={actualExpenses}
                       />
-                      <h3>Annual Expenses: {`$${annualTotal}`}</h3>
+                      <h3>Annual Expenses: {`$${annualTotal.toFixed(2)}`}</h3>
                       <AnnualExpensesGraph
                         expenses={expenses}
                         actualExpenses={actualExpenses}
