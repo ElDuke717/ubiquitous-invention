@@ -23,3 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 database.db
 expenses.db
+/backend/node_modules
+/frontend/node_modules
+/backend/.env
+/backend/data/database.db
+/backend/data/expenses.db

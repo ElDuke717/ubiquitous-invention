@@ -179,12 +179,17 @@ function App() {
         <nav className="bg-white shadow">
           <div className="max-w-4xl mx-auto px-4">
             <div className="flex justify-between">
+              <img
+                src="/8-bit_green1.png"
+                alt="Logo"
+                className="h-8 w-8 inline-block mr-2 m-6 rounded-full"
+              />
               <div>
                 <Link
                   to="/"
                   className="text-gray-800 text-xl font-bold py-5 block"
                 >
-                  Home Budgeting Application Home
+                  Your Budget Home
                 </Link>
               </div>
               <div className="flex space-x-4">
@@ -222,8 +227,18 @@ function App() {
                 <div className="min-h-screen bg-gray-100">
                   <div className="max-w-4xl mx-auto py-10">
                     <h1 className="text-3xl font-bold text-center text-gray-800 mb-10">
-                      Home Budgeting Application
+                      Set Your Home Budget
                     </h1>
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-10">
+                      <p className="text-1xl text-gray-800 mb-5">
+                        Add each of your monthly expense targets below.
+                      </p>
+                      <p className="text-1xl text-gray-800">
+                        After entering each target amount, click the Save
+                        Expenses button to save them. Graphs of your monthly and
+                        annual expenses are at the bottom of the page.
+                      </p>
+                    </div>
                     <div className="space-y-8">
                       {Object.keys(categories).map((category) => (
                         <div

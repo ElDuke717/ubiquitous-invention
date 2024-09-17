@@ -11,8 +11,6 @@ const db = require("./database");
 
 // Initialize the database
 db.serialize(() => {
-  
-
   // Create the expenses table with the corrected schema
   db.run(`
     CREATE TABLE IF NOT EXISTS expenses (
@@ -24,7 +22,6 @@ db.serialize(() => {
   `);
 
   // Create the individual_expenses table
-  db.run(`DROP TABLE IF EXISTS individual_expenses`);
   db.run(`
     CREATE TABLE IF NOT EXISTS individual_expenses (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

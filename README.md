@@ -1,10 +1,9 @@
+# Home Budgeting Application 🏠💰
 
-
-# Home Budgeting Application
-
-A web-based application designed to help users manage their household expenses, track budgets, and analyze financial trends with graphical representations.
+A web-based application designed to help users manage their household expenses, track budgets, add journal entries, and analyze financial trends with graphical representations.
 
 ## Table of Contents
+
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
@@ -13,7 +12,7 @@ A web-based application designed to help users manage their household expenses, 
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [License](#license)
-  
+
 ---
 
 ## Features
@@ -76,34 +75,38 @@ A web-based application designed to help users manage their household expenses, 
    ```
 
 3. **Set up the database**:
-   Ensure SQLite is properly configured. The application will automatically create tables upon starting the backend.
+   Ensure SQLite is properly configured. The application will automatically create tables upon starting the backend in `/backend/data`.
 
 4. **Start the backend server**:
 
    ```bash
    cd backend
-   npm start
+   node index.js
    ```
 
    This will start the server on `http://localhost:5001`.
 
 5. **Start the frontend server**:
+
+   In a new terminal window in the base folder:
+
    ```bash
-   cd ../frontend
    npm start
    ```
+
    This will start the React application on `http://localhost:3000`.
 
 ---
 
 ## Usage
 
-1. **Homepage**: View and edit budgeted expenses across various categories.
+1. **Your Home Budget**: View and edit budgeted expenses across various categories.
 2. **Add Expense**: Manually add expenses to track actual spending.
 3. **Monthly Expenses**: View a breakdown of actual vs. budgeted expenses.
 4. **Journal**: Add personal finance-related notes and journal entries.
 5. **Credit Card Management**: Manage and track credit card details.
 6. **Graphs**: View graphical representations of monthly and annual expenses.
+7. **72T Calculator**: Calculate the amount you can withdraw from your retirement account without penalty and track the remaining balance over time.
 
 ---
 
@@ -168,4 +171,3 @@ home-budgeting-app/
 ## License
 
 This project is licensed under the MIT License.
-
