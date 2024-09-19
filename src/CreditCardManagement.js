@@ -30,7 +30,7 @@ function CreditCardManagement() {
   // Fetch credit cards from the backend
   const fetchCreditCards = () => {
     axios
-      .get("http://localhost:5001/credit-cards")
+      .get("http://localhost:5001/credit-cards", { withCredentials: true })
       .then((response) => {
         setCreditCards(response.data);
       })
@@ -55,7 +55,9 @@ function CreditCardManagement() {
     // Validation can be added here
 
     axios
-      .post("http://localhost:5001/credit-cards", newCard)
+      .post("http://localhost:5001/credit-cards", newCard, {
+        withCredentials: true,
+      })
       .then((response) => {
         alert("Credit card added successfully!");
         setShowAddModal(false);

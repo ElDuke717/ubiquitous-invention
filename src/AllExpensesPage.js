@@ -1,87 +1,36 @@
-// MonthlyExpensesPage.js
+// AllExpensesPage.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-function MonthlyExpensesPage({ categories }) {
-  const [monthlyExpenses, setMonthlyExpenses] = useState([]);
-  const [budgetedExpenses, setBudgetedExpenses] = useState({});
-  const [expenseSummary, setExpenseSummary] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Manage modal visibility
-  const [selectedExpense, setSelectedExpense] = useState(null); // Manage selected expense for editing
+function AllExpensesPage({ categories }) {
+  const [expenses, setExpenses] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const expensesPerPage = 50;
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch data (as per your existing code)
+  // Fetch expenses with pagination
   useEffect(() => {
-    const currentDate = new Date();
-    const currentMonth = (currentDate.getMonth() + 1).toString(); // Months are 0-based in JS
-    const currentYear = currentDate.getFullYear().toString();
-  
-    // Fetch individual expenses for the current month
+    fetchExpenses();
+  }, [currentPage, searchTerm]);
+
+  const fetchExpenses = () => {
     axios
-      .get("http://localhost:5001/individual-expenses", {
-        params: { month: currentMonth, year: currentYear },
+      .get("http://localhost:5001/individual-expenses-paginated", {
+        params: {
+          page: currentPage,
+          limit: expensesPerPage,
+          search: searchTerm,
+        },
       })
       .then((response) => {
-        // Sort the expenses by date in descending order
-        const sortedExpenses = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
-        setMonthlyExpenses(sortedExpenses);
+        setExpenses(response.data.expenses);
+        setTotalPages(response.data.totalPages);
       })
       .catch((error) => console.error(error));
-  
-    // Fetch budgeted expenses
-    axios
-      .get("http://localhost:5001/expenses")
-      .then((response) => {
-        const fetchedExpenses = response.data;
-        const expensesByCategory = {};
-  
-        fetchedExpenses.forEach((expense) => {
-          const { category, subcategory, amount } = expense;
-          if (!expensesByCategory[category]) {
-            expensesByCategory[category] = {};
-          }
-          expensesByCategory[category][subcategory] = amount;
-        });
-  
-        setBudgetedExpenses(expensesByCategory);
-      })
-      .catch((error) => console.error(error));
-  }, []);
-
-  useEffect(() => {
-    // Calculate expense summary once data is fetched
-    const summary = {};
-
-    // Aggregate actual expenses by category
-    monthlyExpenses.forEach((expense) => {
-      const { category, amount } = expense;
-      if (!summary[category]) {
-        summary[category] = { budgeted: 0, actual: 0 };
-      }
-      summary[category].actual += amount;
-    });
-
-    // Add budgeted amounts
-    Object.keys(budgetedExpenses).forEach((category) => {
-      if (!summary[category]) {
-        summary[category] = { budgeted: 0, actual: 0 };
-      }
-      const categoryBudget = Object.values(budgetedExpenses[category]).reduce(
-        (sum, amount) => sum + amount,
-        0
-      );
-      summary[category].budgeted = categoryBudget;
-    });
-
-    // Convert summary object to array for rendering
-    const summaryArray = Object.keys(summary).map((category) => ({
-      category,
-      budgeted: summary[category].budgeted,
-      actual: summary[category].actual,
-      difference: summary[category].budgeted - summary[category].actual,
-    }));
-
-    setExpenseSummary(summaryArray);
-  }, [monthlyExpenses, budgetedExpenses]);
+  };
 
   // Function to open the modal and select the expense
   const handleEditClick = (expense) => {
@@ -110,10 +59,10 @@ function MonthlyExpensesPage({ categories }) {
       )
       .then((response) => {
         // Refresh the expenses after successful update
-        const updatedExpenses = monthlyExpenses.map((expense) =>
+        const updatedExpenses = expenses.map((expense) =>
           expense.id === selectedExpense.id ? selectedExpense : expense
         );
-        setMonthlyExpenses(updatedExpenses);
+        setExpenses(updatedExpenses);
         setShowModal(false);
       })
       .catch((error) => console.error(error));
@@ -122,62 +71,73 @@ function MonthlyExpensesPage({ categories }) {
   // Function to delete the expense
   const handleDeleteExpense = (id) => {
     const confirmed = window.confirm("Are you sure you want to delete this expense?");
-    
+
     if (confirmed) {
       axios
         .delete(`http://localhost:5001/individual-expenses/${id}`)
         .then((response) => {
           // Refresh the expenses after successful delete
-          const updatedExpenses = monthlyExpenses.filter(
+          const updatedExpenses = expenses.filter(
             (expense) => expense.id !== id
           );
-          setMonthlyExpenses(updatedExpenses);
+          setExpenses(updatedExpenses);
         })
         .catch((error) => console.error(error));
     }
   };
 
-  // Helper function to convert a date from YYYY-MM-DD to DD-MM-YYYY
+  // Helper function to convert a date from YYYY-MM-DD to MM-DD-YYYY
   const formatDateToMMDDYYYY = (dateStr) => {
-    const [year, month, day] = dateStr.split("-");
+    const date = new Date(dateStr);
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const year = date.getFullYear();
     return `${month}-${day}-${year}`;
   };
 
+  // Pagination Controls
+  const renderPagination = () => (
+    <div className="flex justify-center mt-4">
+      <button
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+        className="px-4 py-2 bg-gray-300 rounded-l"
+      >
+        Previous
+      </button>
+      <span className="px-4 py-2 bg-gray-200">
+        Page {currentPage} of {totalPages}
+      </span>
+      <button
+        onClick={() =>
+          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+        }
+        disabled={currentPage === totalPages}
+        className="px-4 py-2 bg-gray-300 rounded-r"
+      >
+        Next
+      </button>
+    </div>
+  );
+
   return (
-    <div className="max-w-4xl mx-auto py-10">
-      <h2 className="text-2xl font-bold mb-5">Monthly Expenses Summary</h2>
-      <table className="min-w-full bg-white shadow-md rounded">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b">Category</th>
-            <th className="py-2 px-4 border-b">Budgeted Amount ($)</th>
-            <th className="py-2 px-4 border-b">Actual Spent ($)</th>
-            <th className="py-2 px-4 border-b">Difference ($)</th>
-            <th className="py-2 px-4 border-b">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenseSummary.map((item) => (
-            <tr key={item.category}>
-              <td className="py-2 px-4 border-b">{item.category}</td>
-              <td className="py-2 px-4 border-b">{item.budgeted.toFixed(2)}</td>
-              <td className="py-2 px-4 border-b">{item.actual.toFixed(2)}</td>
-              <td className="py-2 px-4 border-b">
-                {item.difference.toFixed(2)}
-              </td>
-              <td className="py-2 px-4 border-b">
-                {item.difference >= 0 ? (
-                  <span className="text-green-600">Under Budget</span>
-                ) : (
-                  <span className="text-red-600">Over Budget</span>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {/* Detailed Expenses List */}
-      <h3 className="text-xl font-bold mt-10 mb-5">Detailed Expenses</h3>
+    <div className="max-w-6xl mx-auto py-10">
+      <h2 className="text-2xl font-bold mb-5">All Expenses</h2>
+      {/* Search Input */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search expenses..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // Reset to first page on new search
+          }}
+          className="border border-gray-300 rounded-md p-2 w-full"
+        />
+      </div>
+      
+      {/* Expenses Table */}
       <table className="min-w-full bg-white shadow-md rounded">
         <thead>
           <tr>
@@ -191,7 +151,7 @@ function MonthlyExpensesPage({ categories }) {
           </tr>
         </thead>
         <tbody>
-          {monthlyExpenses.map((expense) => (
+          {expenses.map((expense) => (
             <tr key={expense.id}>
               <td className="py-2 px-4 border-b">
                 {formatDateToMMDDYYYY(expense.date)}
@@ -200,30 +160,30 @@ function MonthlyExpensesPage({ categories }) {
               <td className="py-2 px-4 border-b">{expense.category}</td>
               <td className="py-2 px-4 border-b">{expense.subcategory}</td>
               <td className="py-2 px-4 border-b">
-                {expense.amount.toFixed(2)}
+                {parseFloat(expense.amount).toFixed(2)}
               </td>
               <td className="py-2 px-4 border-b">{expense.description}</td>
               <td className="py-2 px-4 border-b">
-            <div className="flex flex-col space-y-2">
-                <button
-                onClick={() => handleEditClick(expense)}
-                className="bg-blue-500 text-white w-full py-2 rounded"
-                >
-                Edit
-                </button>
-                <button
-                onClick={() => handleDeleteExpense(expense.id)}
-                className="bg-red-500 text-white w-full py-2 rounded"
-                >
-                Delete
-                </button>
-            </div>
-            </td>
+                <div className="flex flex-col space-y-2">
+                  <button
+                    onClick={() => handleEditClick(expense)}
+                    className="bg-blue-500 text-white w-full py-2 rounded"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteExpense(expense.id)}
+                    className="bg-red-500 text-white w-full py-2 rounded"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-
+      {renderPagination()}
       {/* Modal for Editing Expense */}
       {showModal && selectedExpense && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -312,7 +272,7 @@ function MonthlyExpensesPage({ categories }) {
                 <input
                   type="text"
                   name="description"
-                  value={selectedExpense.description}
+                  value={selectedExpense.description || ''}
                   onChange={handleModalChange}
                   className="border border-gray-300 rounded-md p-2 w-full"
                 />
@@ -338,4 +298,4 @@ function MonthlyExpensesPage({ categories }) {
   );
 }
 
-export default MonthlyExpensesPage;
+export default AllExpensesPage;

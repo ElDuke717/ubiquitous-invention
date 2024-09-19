@@ -22,6 +22,8 @@ A web-based application designed to help users manage their household expenses, 
 - **Graphs & Visualizations**: Visualize monthly and annual expenses with graphical representation.
 - **Expense Management**: Add and edit individual expenses, and delete them with a confirmation dialog.
 - **Journal & Credit Management**: Keep track of personal finance-related journal entries and manage credit cards.
+- **72T Calculator**: Calculate the amount you can withdraw from your retirement account without penalty and track the remaining balance over time.
+- **Authentication** Add users manually to control access to the application. There is no registration and users are added manually to the database for added security.
 
 ---
 
@@ -128,6 +130,10 @@ A web-based application designed to help users manage their household expenses, 
 
 - **/journal**: Manage journal entries.
 - **/credit-cards**: Manage credit card data.
+
+## Authentication
+
+- Use the `addUser` function in `database.js` to add users manually to the database. There is no registration or login functionality. Make sure that you do not run it without changing the default username and password!
 
 ---
 
