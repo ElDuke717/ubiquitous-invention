@@ -111,7 +111,7 @@ function App() {
   // Check authentication status on mount
   useEffect(() => {
     axios
-      .get("http://localhost:5001/check-auth", { withCredentials: true })
+      .get("api/check-auth", { withCredentials: true })
       .then((response) => {
         setIsAuthenticated(response.data.isAuthenticated);
       })
@@ -124,7 +124,7 @@ function App() {
   useEffect(() => {
     if (isAuthenticated) {
       axios
-        .get("http://localhost:5001/expenses", { withCredentials: true })
+        .get("/api/expenses", { withCredentials: true })
         .then((response) => {
           const fetchedExpenses = response.data;
           const expensesByCategory = {};
@@ -141,7 +141,7 @@ function App() {
 
       // Fetch actual expenses
       axios
-        .get("http://localhost:5001/individual-expenses", {
+        .get("/api/individual-expenses", {
           withCredentials: true,
         })
         .then((response) => {
@@ -190,7 +190,7 @@ function App() {
     });
 
     axios
-      .post("http://localhost:5001/expenses", expensesArray, {
+      .post("/api/expenses", expensesArray, {
         withCredentials: true,
       })
       .then((response) => console.log(response.data))
@@ -199,7 +199,7 @@ function App() {
 
   const handleLogout = () => {
     axios
-      .post("http://localhost:5001/logout", {}, { withCredentials: true })
+      .post("/api/logout", {}, { withCredentials: true })
       .then(() => {
         setIsAuthenticated(false);
         navigate("/login");

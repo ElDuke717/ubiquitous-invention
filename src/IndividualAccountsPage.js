@@ -21,7 +21,7 @@ function IndividualAccountsPage() {
   // Function to fetch all accounts
   const fetchAccounts = () => {
     axios
-      .get("http://localhost:5001/accounts")
+      .get("/api/accounts")
       .then((response) => {
         setAccounts(response.data);
       })
@@ -36,7 +36,7 @@ function IndividualAccountsPage() {
     }
 
     axios
-      .post("http://localhost:5001/accounts", {
+      .post("/api/accounts", {
         name: newAccountName,
         starting_balance: parseFloat(newAccountBalance),
       })
@@ -58,7 +58,7 @@ function IndividualAccountsPage() {
   // Function to fetch transactions for an account
   const fetchTransactions = (accountId) => {
     axios
-      .get(`http://localhost:5001/accounts/${accountId}/transactions`)
+      .get(`/api/accounts/${accountId}/transactions`)
       .then((response) => {
         setTransactions(response.data);
       })
@@ -88,7 +88,7 @@ function IndividualAccountsPage() {
     }
 
     axios
-      .post(`http://localhost:5001/accounts/${accountId}/transactions`, {
+      .post(`/api/accounts/${accountId}/transactions`, {
         ...transaction,
         amount: parseFloat(transaction.amount),
       })
@@ -115,7 +115,7 @@ function IndividualAccountsPage() {
     );
     if (confirmed) {
       axios
-        .delete(`http://localhost:5001/accounts/${accountId}`)
+        .delete(`/api/accounts/${accountId}`)
         .then((response) => {
           fetchAccounts();
           setShowModal(false);
@@ -131,7 +131,7 @@ function IndividualAccountsPage() {
     );
     if (confirmed) {
       axios
-        .delete(`http://localhost:5001/transactions/${transactionId}`)
+        .delete(`/api/transactions/${transactionId}`)
         .then((response) => {
           fetchAccounts(); // Update account balances
           fetchTransactions(selectedAccount.id); // Refresh transactions list
@@ -158,7 +158,7 @@ function IndividualAccountsPage() {
   // Function to update the transaction
   const handleUpdateTransaction = () => {
     axios
-      .put(`http://localhost:5001/transactions/${transactionToEdit.id}`, {
+      .put(`/api/transactions/${transactionToEdit.id}`, {
         ...transactionToEdit,
         amount: parseFloat(transactionToEdit.amount),
       })
@@ -280,7 +280,7 @@ function IndividualAccountsPage() {
 
             {/* View Transactions Button */}
             <div
-              className="mt-4 text-center text-blue-500 cursor-pointer"
+              className="mt-4 text-center text-white bg-green-500 cursor-pointer px-4 py-2 rounded w-full"
               onClick={() => handleAccountClick(account)}
             >
               View Transactions

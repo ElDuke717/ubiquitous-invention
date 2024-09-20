@@ -30,7 +30,7 @@ function CreditCardManagement() {
   // Fetch credit cards from the backend
   const fetchCreditCards = () => {
     axios
-      .get("http://localhost:5001/credit-cards", { withCredentials: true })
+      .get("/api/credit-cards", { withCredentials: true })
       .then((response) => {
         setCreditCards(response.data);
       })
@@ -55,7 +55,7 @@ function CreditCardManagement() {
     // Validation can be added here
 
     axios
-      .post("http://localhost:5001/credit-cards", newCard, {
+      .post("/api/credit-cards", newCard, {
         withCredentials: true,
       })
       .then((response) => {
@@ -112,7 +112,7 @@ function CreditCardManagement() {
     // Send updated data to backend
     axios
       .put(
-        `http://localhost:5001/credit-cards/${currentCard.id}`,
+        `/api/credit-cards/${currentCard.id}`,
         currentCardData
       )
       .then((response) => {

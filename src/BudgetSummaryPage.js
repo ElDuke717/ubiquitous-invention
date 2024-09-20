@@ -10,7 +10,7 @@ function BudgetSummaryPage() {
   // Fetch budgeted expenses once
   useEffect(() => {
     axios
-      .get("http://localhost:5001/expenses")
+      .get("/api/expenses")
       .then((response) => {
         const fetchedExpenses = response.data;
         const expensesByCategory = {};
@@ -33,7 +33,7 @@ function BudgetSummaryPage() {
     const year = selectedMonth.getFullYear().toString();
 
     axios
-      .get("http://localhost:5001/individual-expenses", {
+      .get("/api/individual-expenses", {
         params: { month: month, year: year },
       })
       .then((response) => {

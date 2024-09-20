@@ -18,7 +18,7 @@ function AllExpensesPage({ categories }) {
 
   const fetchExpenses = () => {
     axios
-      .get("http://localhost:5001/individual-expenses-paginated", {
+      .get("/api/individual-expenses-paginated", {
         params: {
           page: currentPage,
           limit: expensesPerPage,
@@ -54,7 +54,7 @@ function AllExpensesPage({ categories }) {
   const handleUpdateExpense = () => {
     axios
       .put(
-        `http://localhost:5001/individual-expenses/${selectedExpense.id}`,
+        `/api/individual-expenses/${selectedExpense.id}`,
         selectedExpense
       )
       .then((response) => {
@@ -74,7 +74,7 @@ function AllExpensesPage({ categories }) {
 
     if (confirmed) {
       axios
-        .delete(`http://localhost:5001/individual-expenses/${id}`)
+        .delete(`/api/individual-expenses/${id}`)
         .then((response) => {
           // Refresh the expenses after successful delete
           const updatedExpenses = expenses.filter(

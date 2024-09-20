@@ -14,7 +14,7 @@ function JournalPage() {
 
   const fetchJournalEntries = () => {
     axios
-      .get('http://localhost:5001/journal', {
+      .get('/api/journal', {
         params: { page, limit: 10 },
       })
       .then((response) => {
@@ -43,7 +43,7 @@ function JournalPage() {
     }
 
     axios
-      .post('http://localhost:5001/journal', newEntry)
+      .post('/api/journal', newEntry)
       .then((response) => {
         alert('Journal entry added successfully!');
         setShowModal(false);

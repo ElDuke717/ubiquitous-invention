@@ -17,7 +17,7 @@ function MonthlyExpensesPage({ categories }) {
   
     // Fetch individual expenses for the current month
     axios
-      .get("http://localhost:5001/individual-expenses", {
+      .get("/api/individual-expenses", {
         params: { month: currentMonth, year: currentYear },
       })
       .then((response) => {
@@ -29,7 +29,7 @@ function MonthlyExpensesPage({ categories }) {
   
     // Fetch budgeted expenses
     axios
-      .get("http://localhost:5001/expenses")
+      .get("/api/expenses")
       .then((response) => {
         const fetchedExpenses = response.data;
         const expensesByCategory = {};
@@ -105,7 +105,7 @@ function MonthlyExpensesPage({ categories }) {
   const handleUpdateExpense = () => {
     axios
       .put(
-        `http://localhost:5001/individual-expenses/${selectedExpense.id}`,
+        `/api/individual-expenses/${selectedExpense.id}`,
         selectedExpense
       )
       .then((response) => {
@@ -125,7 +125,7 @@ function MonthlyExpensesPage({ categories }) {
     
     if (confirmed) {
       axios
-        .delete(`http://localhost:5001/individual-expenses/${id}`)
+        .delete(`/api/individual-expenses/${id}`)
         .then((response) => {
           // Refresh the expenses after successful delete
           const updatedExpenses = monthlyExpenses.filter(

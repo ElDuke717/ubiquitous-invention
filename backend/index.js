@@ -127,7 +127,7 @@ function isAuthenticated(req, res, next) {
 }
 
 // Register a new user
-app.post("/register", async (req, res) => {
+app.post("/api/register", async (req, res) => {
   const { username, password } = req.body;
 
   // Check if the user already exists
@@ -171,7 +171,7 @@ app.post("/register", async (req, res) => {
 });
 
 // Login route
-app.post("/login", (req, res) => {
+app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
 
   // Find the user
@@ -209,7 +209,7 @@ app.post("/login", (req, res) => {
 });
 
 // Logout route
-app.post("/logout", (req, res) => {
+app.post("/api/logout", (req, res) => {
   req.session.destroy();
   res.json({ message: "Logged out successfully" });
 });
@@ -227,7 +227,7 @@ app.get("/check-auth", (req, res) => {
 
 // this is used by App.js budget entry form
 // Route to add budgeted expenses
-app.post("/expenses", (req, res) => {
+app.post("/api/expenses", (req, res) => {
   const expenses = req.body; // Expecting an array of expense objects
 
   db.serialize(() => {
@@ -259,7 +259,7 @@ app.post("/expenses", (req, res) => {
 
 // Get all expenses - used by MonthlyExpensesPage to get all of the expenses
 
-app.get("/expenses", (req, res) => {
+app.get("/api/expenses", (req, res) => {
   db.all(`SELECT * FROM expenses`, [], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -270,7 +270,7 @@ app.get("/expenses", (req, res) => {
 });
 
 // Route to add a new individual expense
-app.post("/individual-expenses", (req, res) => {
+app.post("/api/individual-expenses", (req, res) => {
   const { amount, vendor, date, category, subcategory, description } = req.body;
 
   // Validate the input
@@ -301,7 +301,7 @@ app.post("/individual-expenses", (req, res) => {
 });
 
 // Route to get individual expenses for a specific month and year
-app.get("/individual-expenses", (req, res) => {
+app.get("/api/individual-expenses", (req, res) => {
   const { month, year } = req.query;
 
   let sql = `SELECT * FROM individual_expenses`;
@@ -322,7 +322,7 @@ app.get("/individual-expenses", (req, res) => {
 });
 
 // Update individual expenses
-app.put("/individual-expenses/:id", (req, res) => {
+app.put("/api/individual-expenses/:id", (req, res) => {
   const { id } = req.params;
   const { amount, vendor, date, category, subcategory, description } = req.body;
 
@@ -347,7 +347,7 @@ app.put("/individual-expenses/:id", (req, res) => {
 });
 
 // delete an expense
-app.delete("/individual-expenses/:id", (req, res) => {
+app.delete("/api/individual-expenses/:id", (req, res) => {
   const { id } = req.params;
 
   const sql = `DELETE FROM individual_expenses WHERE id = ?`;
@@ -362,7 +362,7 @@ app.delete("/individual-expenses/:id", (req, res) => {
 });
 
 // Route to add a new journal entry
-app.post("/journal", (req, res) => {
+app.post("/api/journal", (req, res) => {
   const { title, date, content } = req.body;
 
   if (!title || !date || !content) {
@@ -389,7 +389,7 @@ app.post("/journal", (req, res) => {
 });
 
 // Route to get journal entries with pagination
-app.get("/journal", (req, res) => {
+app.get("/api/journal", (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const offset = (page - 1) * limit;
 
@@ -408,7 +408,7 @@ app.get("/journal", (req, res) => {
   });
 });
 
-app.post("/credit-cards", (req, res) => {
+app.post("/api/credit-cards", (req, res) => {
   const {
     lastFourDigits,
     type,
@@ -469,7 +469,7 @@ app.post("/credit-cards", (req, res) => {
 });
 
 // Route to get all credit cards
-app.get("/credit-cards", (req, res) => {
+app.get("/api/credit-cards", (req, res) => {
   const sql = `SELECT * FROM credit_cards ORDER BY issuer, type`;
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -481,7 +481,7 @@ app.get("/credit-cards", (req, res) => {
 });
 
 // Route to update a credit card
-app.put("/credit-cards/:id", (req, res) => {
+app.put("/api/credit-cards/:id", (req, res) => {
   const id = req.params.id;
   const {
     lastFourDigits,
@@ -553,7 +553,7 @@ app.put("/credit-cards/:id", (req, res) => {
 
 // Route to get individual expenses with pagination
 // index.js (Backend)
-app.get('/individual-expenses-paginated', (req, res) => {
+app.get('/api/individual-expenses-paginated', (req, res) => {
   const { page = 1, limit = 50, search = '' } = req.query;
 
   const offset = (page - 1) * limit;
@@ -592,7 +592,7 @@ app.get('/individual-expenses-paginated', (req, res) => {
 });
 
 // Create a new account
-app.post("/accounts", (req, res) => {
+app.post("/api/accounts", (req, res) => {
   const { name, starting_balance } = req.body;
 
   if (!name || starting_balance === undefined) {
@@ -614,7 +614,7 @@ app.post("/accounts", (req, res) => {
 });
 
 // Get all accounts
-app.get("/accounts", (req, res) => {
+app.get("/api/accounts", (req, res) => {
   const sql = `SELECT * FROM accounts`;
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -626,7 +626,7 @@ app.get("/accounts", (req, res) => {
 });
 
 // Delete an account
-app.delete("/accounts/:id", (req, res) => {
+app.delete("/api/accounts/:id", (req, res) => {
   const { id } = req.params;
   const sql = `DELETE FROM accounts WHERE id = ?`;
 
@@ -640,7 +640,7 @@ app.delete("/accounts/:id", (req, res) => {
 });
 
 // Add a transaction to an account
-app.post("/accounts/:accountId/transactions", (req, res) => {
+app.post("/api/accounts/:accountId/transactions", (req, res) => {
   const { accountId } = req.params;
   const { date, vendor, amount, description } = req.body;
 
@@ -673,7 +673,7 @@ app.post("/accounts/:accountId/transactions", (req, res) => {
 });
 
 // Get transactions for an account
-app.get("/accounts/:accountId/transactions", (req, res) => {
+app.get("/api/accounts/:accountId/transactions", (req, res) => {
   const { accountId } = req.params;
   const sql = `
     SELECT * FROM transactions
@@ -690,7 +690,7 @@ app.get("/accounts/:accountId/transactions", (req, res) => {
 });
 
 // Edit a transaction
-app.put("/transactions/:id", (req, res) => {
+app.put("/api/transactions/:id", (req, res) => {
   const { id } = req.params;
   const { date, vendor, amount, description } = req.body;
 
