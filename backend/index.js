@@ -112,6 +112,19 @@ db.serialize(() => {
       FOREIGN KEY(account_id) REFERENCES accounts(id) ON DELETE CASCADE
     )
   `);
+  // Create the subscriptions table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      fee REAL NOT NULL,
+      interval TEXT NOT NULL,
+      renewalDate TEXT,
+      paymentMethod TEXT,
+      autoRenewal INTEGER,
+      notes TEXT
+    )
+  `);
 });
 
 // Middleware to check if the user is authenticated
@@ -724,6 +737,138 @@ app.put("/api/transactions/:id", (req, res) => {
           });
         }
       });
+    }
+  });
+});
+
+/** 
+ * Subscriptions Routes 
+ */
+
+// GET all subscriptions
+app.get("/api/subscriptions", (req, res) => {
+  const sql = `SELECT * FROM subscriptions`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Error fetching subscriptions:", err);
+      res.status(500).json({ error: "Failed to fetch subscriptions" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// POST new subscription
+app.post("/api/subscriptions", (req, res) => {
+  const {
+    name,
+    fee,
+    interval,
+    renewalDate,
+    paymentMethod,
+    autoRenewal,
+    notes,
+  } = req.body;
+
+  if (!name || !fee || !interval) {
+    return res
+      .status(400)
+      .json({ error: "Name, fee, and interval are required." });
+  }
+
+  const sql = `
+    INSERT INTO subscriptions (
+      name, fee, interval, renewalDate, paymentMethod, autoRenewal, notes
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.run(
+    sql,
+    [
+      name,
+      fee,
+      interval,
+      renewalDate || null,
+      paymentMethod || null,
+      autoRenewal ? 1 : 0,
+      notes || null,
+    ],
+    function (err) {
+      if (err) {
+        console.error("Error creating subscription:", err);
+        res.status(500).json({ error: "Failed to create subscription" });
+      } else {
+        res.status(201).json({ id: this.lastID, ...req.body });
+      }
+    }
+  );
+});
+
+// PUT update a subscription
+app.put("/api/subscriptions/:id", (req, res) => {
+  const subscriptionId = req.params.id;
+  const {
+    name,
+    fee,
+    interval,
+    renewalDate,
+    paymentMethod,
+    autoRenewal,
+    notes,
+  } = req.body;
+
+  if (!name || !fee || !interval) {
+    return res
+      .status(400)
+      .json({ error: "Name, fee, and interval are required." });
+  }
+
+  const sql = `
+    UPDATE subscriptions SET
+      name = ?,
+      fee = ?,
+      interval = ?,
+      renewalDate = ?,
+      paymentMethod = ?,
+      autoRenewal = ?,
+      notes = ?
+    WHERE id = ?
+  `;
+
+  db.run(
+    sql,
+    [
+      name,
+      fee,
+      interval,
+      renewalDate || null,
+      paymentMethod || null,
+      autoRenewal ? 1 : 0,
+      notes || null,
+      subscriptionId,
+    ],
+    function (err) {
+      if (err) {
+        console.error("Error updating subscription:", err);
+        res.status(500).json({ error: "Failed to update subscription" });
+      } else {
+        res.json({ id: subscriptionId, ...req.body });
+      }
+    }
+  );
+});
+
+// DELETE a subscription
+app.delete("/api/subscriptions/:id", (req, res) => {
+  const subscriptionId = req.params.id;
+  const sql = `DELETE FROM subscriptions WHERE id = ?`;
+
+  db.run(sql, [subscriptionId], function (err) {
+    if (err) {
+      console.error("Error deleting subscription:", err);
+      res.status(500).json({ error: "Failed to delete subscription" });
+    } else {
+      res.status(204).send();
     }
   });
 });
