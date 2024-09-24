@@ -9,12 +9,11 @@ const PORT = 5001;
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your React app's URL
+    origin: "http://localhost:3003", // Replace with your React app's URL
     credentials: true,
   })
 );
 
-console.log("Session secret:", process.env.SESSION_SECRET);
 app.use(bodyParser.json());
 
 app.use(
@@ -110,6 +109,19 @@ db.serialize(() => {
       amount REAL NOT NULL,
       description TEXT,
       FOREIGN KEY(account_id) REFERENCES accounts(id) ON DELETE CASCADE
+    )
+  `);
+  // Create the subscriptions table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      fee REAL NOT NULL,
+      interval TEXT NOT NULL,
+      renewalDate TEXT,
+      paymentMethod TEXT,
+      autoRenewal INTEGER,
+      notes TEXT
     )
   `);
 });
@@ -727,6 +739,85 @@ app.put("/transactions/:id", (req, res) => {
     }
   });
 });
+
+/** 
+ * Subscriptions Routes 
+ */
+
+// GET all subscriptions
+app.get("/subscriptions", (req, res) => {
+  const sql = `SELECT * FROM subscriptions`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Error fetching subscriptions:", err);
+      res.status(500).json({ error: "Failed to fetch subscriptions" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// POST new subscription
+app.post("/subscriptions", (req, res) => {
+  const {
+    name,
+    fee,
+    interval,
+    renewalDate,
+    paymentMethod,
+    autoRenewal,
+    notes,
+  } = req.body;
+
+  if (!name || !fee || !interval) {
+    return res
+      .status(400)
+      .json({ error: "Name, fee, and interval are required." });
+  }
+
+  const sql = `
+    INSERT INTO subscriptions (
+      name, fee, interval, renewalDate, paymentMethod, autoRenewal, notes
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.run(
+    sql,
+    [
+      name,
+      fee,
+      interval,
+      renewalDate || null,
+      paymentMethod || null,
+      autoRenewal ? 1 : 0,
+      notes || null,
+    ],
+    function (err) {
+      if (err) {
+        console.error("Error creating subscription:", err);
+        res.status(500).json({ error: "Failed to create subscription" });
+      } else {
+        res.status(201).json({ id: this.lastID, ...req.body });
+      }
+    }
+  );
+});
+
+// DELETE a subscription
+app.delete("/subscriptions/:id", (req, res) => {
+  const subscriptionId = req.params.id;
+  const sql = `DELETE FROM subscriptions WHERE id = ?`;
+
+  db.run(sql, [subscriptionId], function (err) {
+    if (err) {
+      console.error("Error deleting subscription:", err);
+      res.status(500).json({ error: "Failed to delete subscription" });
+    } else {
+      res.status(204).send();
+    }
+  });
+});
+
 
 
 

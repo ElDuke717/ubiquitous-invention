@@ -12,6 +12,7 @@ import SeventyTwoTCalculator from "./SeventyTwoTCalculator";
 import BudgetSummaryPage from "./BudgetSummaryPage";
 import AllExpensesPage from "./AllExpensesPage";
 import IndividualAccountsPage from "./IndividualAccountsPage";
+import SubscriptionsManagement from "./SubscriptionsManagement";
 import Login from "./Login";
 import "./index.css";
 
@@ -261,6 +262,9 @@ function App() {
                 >
                   Credit Cards
                 </Link>
+                <Link to="/subscriptions" className="text-gray-600 py-5 px-3">
+                  Subscriptions
+                </Link>
                 <Link to="/72t-calculator" className="text-gray-600 py-5 px-3">
                   72T Calculator
                 </Link>
@@ -411,6 +415,10 @@ function App() {
               <Route
                 path="/individual-accounts"
                 element={<IndividualAccountsPage />}
+              />
+              <Route
+                path="/subscriptions"
+                element={<SubscriptionsManagement />}
               />
             </>
           )}
