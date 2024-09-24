@@ -86,14 +86,19 @@ function AllExpensesPage({ categories }) {
     }
   };
 
-  // Helper function to convert a date from YYYY-MM-DD to MM-DD-YYYY
-  const formatDateToMMDDYYYY = (dateStr) => {
-    const date = new Date(dateStr);
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${month}-${day}-${year}`;
-  };
+  // Helper function to convert a date from YYYY-MM-DD to MM-DD-YYYY based on local time
+const formatDateToMMDDYYYY = (dateStr) => {
+  const dateParts = dateStr.split("-"); // Split the date string into [YYYY, MM, DD]
+  
+  // Create a date object using the local time by specifying individual date components
+  const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  
+  return `${month}-${day}-${year}`;
+};
 
   // Pagination Controls
   const renderPagination = () => (

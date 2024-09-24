@@ -362,6 +362,7 @@ function CreditCardManagement() {
       <div className="grid grid-cols-1 gap-6">
         {creditCards.map((card) => (
           <div key={card.id} className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold mb-2">{card.nickname}</h2>
             <h3 className="text-xl font-semibold mb-2">
               {card.issuer} {card.type} **** **** **** ****{" "}
               {card.lastFourDigits}

@@ -29,3 +29,4 @@ expenses.db
 /backend/.env
 /backend/data/database.db
 /backend/data/expenses.db
+backend/node_modules
