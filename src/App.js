@@ -23,7 +23,7 @@ function App() {
   const navigate = useNavigate();
 
   const categories = {
-    Housing: ["Mortgage Payment", "Escrow", "HOA", "Home Maintenance"],
+    Housing: ["Mortgage Principle + Interest", "Escrow", "HOA", "Home Maintenance"],
     Utilities: [
       "Gas",
       "Electricity",
@@ -45,6 +45,7 @@ function App() {
       "Microsoft 365",
       "Canva",
       "Netlify",
+      "Dakboard",
       "Spotify",
     ],
     HealthCare: [
@@ -55,33 +56,32 @@ function App() {
     ],
     Transportation: [
       "Car Insurance",
-      "Tolls",
+      "Tolls and Parking",
       "Registration and DMV Fees",
       "Car Tax",
       "Fuel",
       "Car Maintenance",
     ],
-    FoodAndEssentials: [
+    'Food And Essentials': [
       "Groceries",
+      "Supplements",
       "Costco Membership",
       "Thrive Membership",
-      "Cleaning Supplies",
-      "Toiletries",
+      "Cleaning Supplies & Toiletries"
     ],
     Miscellaneous: [
       "Gifts",
       "Tuition",
       "Tech Supplies",
-      "School Supplies",
       "Mom",
       "Salon/Barber",
       "Umbrella Insurance (Annual)",
-      "Wanda",
+      "Dogs",
       "Reza",
       "Arya",
-      "Other",
+      "Other, see notes",
     ],
-    NonEssentials: [
+    'Non-Essentials': [
       "Eating Out",
       "Vacation/Travel",
       "Nick",
@@ -89,7 +89,7 @@ function App() {
       "Furniture and Electronics",
       "Small Home Items",
     ],
-    Taxes: ["Federal", "State", "Social Security", "Medicare"],
+    Taxes: ["2024 Taxes not paid", "Federal", "State", "Social Security", "Medicare", "Tax Preparation"],
   };
 
   const calculateTotals = () => {

@@ -90,6 +90,17 @@ function BudgetSummaryPage() {
     return date.toLocaleDateString(undefined, options);
   };
 
+  const calculateTotals = () => {
+    return budgetSummary.reduce(
+      (totals, item) => ({
+        totalBudgeted: totals.totalBudgeted + item.budgeted,
+        totalActual: totals.totalActual + item.actual,
+        totalDifference: totals.totalDifference + item.difference,
+      }),
+      { totalBudgeted: 0, totalActual: 0, totalDifference: 0 }
+    );
+  };
+
   return (
     <div className="max-w-4xl mx-auto py-10">
       <div className="flex justify-between items-center mb-5">
@@ -126,9 +137,7 @@ function BudgetSummaryPage() {
               <td className="py-2 px-4 border-b">{item.category}</td>
               <td className="py-2 px-4 border-b">{item.budgeted.toFixed(2)}</td>
               <td className="py-2 px-4 border-b">{item.actual.toFixed(2)}</td>
-              <td className="py-2 px-4 border-b">
-                {item.difference.toFixed(2)}
-              </td>
+              <td className="py-2 px-4 border-b">{item.difference.toFixed(2)}</td>
               <td className="py-2 px-4 border-b">
                 {item.difference >= 0 ? (
                   <span className="text-green-600">Under Budget</span>
@@ -138,6 +147,28 @@ function BudgetSummaryPage() {
               </td>
             </tr>
           ))}
+          {/* Summary Row */}
+          {budgetSummary.length > 0 && (
+            <tr className="font-bold bg-gray-100">
+              <td className="py-2 px-4 border-b">TOTAL</td>
+              <td className="py-2 px-4 border-b">
+                {calculateTotals().totalBudgeted.toFixed(2)}
+              </td>
+              <td className="py-2 px-4 border-b">
+                {calculateTotals().totalActual.toFixed(2)}
+              </td>
+              <td className="py-2 px-4 border-b">
+                {calculateTotals().totalDifference.toFixed(2)}
+              </td>
+              <td className="py-2 px-4 border-b">
+                {calculateTotals().totalDifference >= 0 ? (
+                  <span className="text-green-600">Under Budget</span>
+                ) : (
+                  <span className="text-red-600">Over Budget</span>
+                )}
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

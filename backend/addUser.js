@@ -6,8 +6,8 @@
 const bcrypt = require("bcrypt");
 const db = require("./database"); // Adjust the path if necessary
 
-const username = "newuser";
-const password = "password123";
+const username = "user";
+const password = "password";
 
 // Hash the password
 
