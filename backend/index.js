@@ -320,9 +320,12 @@ app.get("/api/individual-expenses", (req, res) => {
   let sql = `SELECT * FROM individual_expenses`;
   const params = [];
 
-  if (month && year) {
+  if (year && month) {
     sql += ` WHERE strftime('%Y-%m', date) = ?`;
     params.push(`${year}-${month.padStart(2, "0")}`);
+  } else if (year) {
+    sql += ` WHERE strftime('%Y', date) = ?`;
+    params.push(year.toString());
   }
 
   db.all(sql, params, (err, rows) => {
