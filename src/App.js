@@ -21,6 +21,7 @@ function App() {
   const [expenses, setExpenses] = useState({});
   const [actualExpenses, setActualExpenses] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const categories = {
@@ -214,68 +215,119 @@ function App() {
       {/* Conditionally render the nav bar */}
       {isAuthenticated && (
         <nav className="bg-white shadow">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="flex justify-between item-center">
-              <img
-                src="/8-bit_green1.png"
-                alt="Logo"
-                className="h-8 w-8 inline-block mr-2 m-6 rounded-full"
-              />
-              <div>
+          <div className="container mx-auto px-4">
+            <div className="relative flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <img
+                  src="/8-bit_green1.png"
+                  alt="Logo"
+                  className="h-8 w-8 rounded-full"
+                />
                 <Link
                   to="/"
-                  className="text-gray-800 text-xl font-bold py-5 block"
+                  className="text-gray-800 text-xl font-bold ml-2"
                 >
                   Your Budget Home
                 </Link>
               </div>
-              <div className="flex space-x-4">
-                <Link to="/add-expense" className="text-gray-600 py-5 px-3">
+
+              {/* Mobile menu button */}
+              <div className="flex lg:hidden">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="text-gray-600 hover:text-gray-900 focus:outline-none"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M4 6h16M4 12h16M4 18h16"></path>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Desktop navigation */}
+              <div className="hidden lg:flex lg:items-center lg:space-x-4">
+                <Link to="/add-expense" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Add Expense
                 </Link>
-                <Link to="/all-expenses" className="text-gray-600 py-5 px-3">
+                <Link to="/all-expenses" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   All Expenses
                 </Link>
-                <Link
-                  to="/monthly-expenses"
-                  className="text-gray-600 py-5 px-3"
-                >
+                <Link to="/monthly-expenses" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Current Monthly Expenses
                 </Link>
-                <Link
-                  to="/monthly-budget"
-                  className="text-gray-600 py-5 px-3"
-                >
+                <Link to="/monthly-budget" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Monthly Budgets
                 </Link>
-                <Link
-                  to="/individual-accounts"
-                  className="text-gray-600 py-5 px-3"
-                >
+                <Link to="/individual-accounts" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Individual Accounts
                 </Link>
-                <Link to="/journal" className="text-gray-600 py-5 px-3">
+                <Link to="/journal" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Journal
                 </Link>
-                <Link
-                  to="/credit-card-management"
-                  className="text-gray-600 py-5 px-3"
-                >
+                <Link to="/credit-card-management" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Credit Cards
                 </Link>
-                <Link to="/subscriptions" className="text-gray-600 py-5 px-3">
+                <Link to="/subscriptions" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Subscriptions
                 </Link>
-                <Link to="/72t-calculator" className="text-gray-600 py-5 px-3">
+                <Link to="/72t-calculator" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   72T Calculator
                 </Link>
-                <Link to="/annual-budget" className="text-gray-600 py-5 px-3">
+                <Link to="/annual-budget" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Annual Budget
                 </Link>
-
                 <button
                   onClick={handleLogout}
-                  className="text-gray-600 py-5 px-3"
+                  className="text-gray-600 hover:text-gray-900 px-3 py-2"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile menu */}
+            <div className={`lg:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                <Link to="/add-expense" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Add Expense
+                </Link>
+                <Link to="/all-expenses" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  All Expenses
+                </Link>
+                <Link to="/monthly-expenses" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Current Monthly Expenses
+                </Link>
+                <Link to="/monthly-budget" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Monthly Budgets
+                </Link>
+                <Link to="/individual-accounts" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Individual Accounts
+                </Link>
+                <Link to="/journal" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Journal
+                </Link>
+                <Link to="/credit-card-management" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Credit Cards
+                </Link>
+                <Link to="/subscriptions" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Subscriptions
+                </Link>
+                <Link to="/72t-calculator" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  72T Calculator
+                </Link>
+                <Link to="/annual-budget" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Annual Budget
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left text-gray-600 hover:text-gray-900 px-3 py-2"
                 >
                   Logout
                 </button>
