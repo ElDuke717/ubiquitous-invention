@@ -9,10 +9,11 @@ import MonthlyExpensesPage from "./MonthlyExpensesPage";
 import JournalPage from "./JournalPage";
 import CreditCardManagement from "./CreditCardManagement";
 import SeventyTwoTCalculator from "./SeventyTwoTCalculator";
-import BudgetSummaryPage from "./BudgetSummaryPage";
+import MonthlyBudgetSummary from "./MonthlyBudgetSummary";
 import AllExpensesPage from "./AllExpensesPage";
 import IndividualAccountsPage from "./IndividualAccountsPage";
 import SubscriptionsManagement from "./SubscriptionsManagement";
+import AnnualBudget from "./AnnualBudget";
 import Login from "./Login";
 import "./index.css";
 
@@ -242,7 +243,7 @@ function App() {
                   Current Monthly Expenses
                 </Link>
                 <Link
-                  to="/budget-summary-page"
+                  to="/monthly-budget"
                   className="text-gray-600 py-5 px-3"
                 >
                   Monthly Budgets
@@ -267,6 +268,9 @@ function App() {
                 </Link>
                 <Link to="/72t-calculator" className="text-gray-600 py-5 px-3">
                   72T Calculator
+                </Link>
+                <Link to="/annual-budget" className="text-gray-600 py-5 px-3">
+                  Annual Budget
                 </Link>
 
                 <button
@@ -400,8 +404,8 @@ function App() {
                 element={<AllExpensesPage categories={categories} />}
               />
               <Route
-                path="/budget-summary-page"
-                element={<BudgetSummaryPage categories={categories} />}
+                path="/monthly-budget"
+                element={<MonthlyBudgetSummary categories={categories} />}
               />
               <Route path="/journal" element={<JournalPage />} />
               <Route
@@ -419,6 +423,10 @@ function App() {
               <Route
                 path="/subscriptions"
                 element={<SubscriptionsManagement />}
+              />
+              <Route
+                path="/annual-budget"
+                element={<AnnualBudget />}
               />
             </>
           )}
