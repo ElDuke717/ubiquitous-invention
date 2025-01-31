@@ -9,7 +9,7 @@ const PORT = 5001;
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://192.168.1.253"], // Allow both localhost and IP access
+    origin: ["http://localhost:3000", "http://192.168.1.253", "https://192.168.1.253", "http://192.168.1.253:3000", "https://192.168.1.253:3000"], // Allow all needed origins
     credentials: true,
   })
 );

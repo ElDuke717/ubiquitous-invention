@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Configure axios defaults for the backend API
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+  withCredentials: true
+});
+
 const AutomaticPayments = () => {
   const [payments, setPayments] = useState([]);
   const [accounts, setAccounts] = useState([]);
@@ -24,9 +30,9 @@ const AutomaticPayments = () => {
     const fetchData = async () => {
       try {
         const [paymentsRes, accountsRes, creditCardsRes] = await Promise.all([
-          axios.get('/api/automatic-payments'),
-          axios.get('/api/accounts'),
-          axios.get('/api/credit-cards')
+          api.get('api/automatic-payments'),
+          api.get('api/accounts'),
+          api.get('api/credit-cards')
         ]);
         setPayments(paymentsRes.data);
         setAccounts(accountsRes.data);
@@ -50,13 +56,13 @@ const AutomaticPayments = () => {
     e.preventDefault();
     try {
       if (isEditing) {
-        await axios.put(`/api/automatic-payments/${editingPayment.id}`, formData);
+        await api.put(`api/automatic-payments/${editingPayment.id}`, formData);
       } else {
-        await axios.post('/api/automatic-payments', formData);
+        await api.post('api/automatic-payments', formData);
       }
       
       // Refresh payments list
-      const response = await axios.get('/api/automatic-payments');
+      const response = await api.get('api/automatic-payments');
       setPayments(response.data);
       
       // Reset form
@@ -95,7 +101,7 @@ const AutomaticPayments = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this automatic payment?')) {
       try {
-        await axios.delete(`/api/automatic-payments/${id}`);
+        await api.delete(`api/automatic-payments/${id}`);
         setPayments(payments.filter(payment => payment.id !== id));
       } catch (error) {
         console.error('Error deleting payment:', error);

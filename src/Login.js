@@ -3,6 +3,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Configure axios defaults for the backend API
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+  withCredentials: true
+});
+
 function Login({ setIsAuthenticated }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -12,11 +18,7 @@ function Login({ setIsAuthenticated }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        "/api/login",
-        { username, password },
-        { withCredentials: true }
-      );
+      await api.post("/api/login", { username, password });
       setIsAuthenticated(true);
       // Redirect to home page after successful login
       navigate("/");

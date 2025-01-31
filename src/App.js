@@ -18,6 +18,12 @@ import AutomaticPayments from "./AutomaticPayments";
 import Login from "./Login";
 import "./index.css";
 
+// Configure axios defaults for the backend API
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+  withCredentials: true
+});
+
 function App() {
   const [expenses, setExpenses] = useState({});
   const [actualExpenses, setActualExpenses] = useState({});
@@ -115,8 +121,8 @@ function App() {
 
   // Check authentication status on mount
   useEffect(() => {
-    axios
-      .get("api/check-auth", { withCredentials: true })
+    api
+      .get("api/check-auth")
       .then((response) => {
         setIsAuthenticated(response.data.isAuthenticated);
       })
@@ -128,8 +134,8 @@ function App() {
   // Fetch expenses when authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      axios
-        .get("/api/expenses", { withCredentials: true })
+      api
+        .get("/api/expenses")
         .then((response) => {
           const fetchedExpenses = response.data;
           const expensesByCategory = {};
@@ -145,10 +151,8 @@ function App() {
         .catch((error) => console.error(error));
 
       // Fetch actual expenses
-      axios
-        .get("/api/individual-expenses", {
-          withCredentials: true,
-        })
+      api
+        .get("/api/individual-expenses")
         .then((response) => {
           const fetchedActualExpenses = response.data;
           const actualExpensesByCategory = {};
@@ -194,17 +198,15 @@ function App() {
       });
     });
 
-    axios
-      .post("/api/expenses", expensesArray, {
-        withCredentials: true,
-      })
+    api
+      .post("/api/expenses", expensesArray)
       .then((response) => console.log(response.data))
       .catch((error) => console.error(error));
   };
 
   const handleLogout = () => {
-    axios
-      .post("/api/logout", {}, { withCredentials: true })
+    api
+      .post("/api/logout", {})
       .then(() => {
         setIsAuthenticated(false);
         navigate("/login");
