@@ -9,7 +9,7 @@ const PORT = 5001;
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your React app's URL
+    origin: ["http://localhost:3000", "https://192.168.1.253"], // Allow both localhost and IP access
     credentials: true,
   })
 );
