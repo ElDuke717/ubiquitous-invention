@@ -112,6 +112,21 @@ db.serialize(() => {
       FOREIGN KEY(account_id) REFERENCES accounts(id) ON DELETE CASCADE
     )
   `);
+  // Create the automatic_payments table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS automatic_payments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vendor TEXT NOT NULL,
+      frequency TEXT NOT NULL,
+      bill_date TEXT NOT NULL,
+      amount REAL,
+      is_fixed_expense INTEGER NOT NULL,
+      general_amount TEXT,
+      account_charged TEXT NOT NULL,
+      autopay INTEGER NOT NULL
+    )
+  `);
+
   // Create the subscriptions table
   db.run(`
     CREATE TABLE IF NOT EXISTS subscriptions (
@@ -876,7 +891,163 @@ app.delete("/api/subscriptions/:id", (req, res) => {
   });
 });
 
+/**
+ * Automatic Payments Routes
+ */
 
+// GET all automatic payments
+app.get("/api/automatic-payments", (req, res) => {
+  const sql = `SELECT * FROM automatic_payments ORDER BY vendor`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Error fetching automatic payments:", err);
+      res.status(500).json({ error: "Failed to fetch automatic payments" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// POST new automatic payment
+app.post("/api/automatic-payments", (req, res) => {
+  const {
+    vendor,
+    frequency,
+    bill_date,
+    amount,
+    is_fixed_expense,
+    general_amount,
+    account_charged,
+    autopay
+  } = req.body;
+
+  if (!vendor || !frequency || !bill_date || !account_charged) {
+    return res.status(400).json({ 
+      error: "Vendor, frequency, bill date, and account charged are required." 
+    });
+  }
+
+  const sql = `
+    INSERT INTO automatic_payments (
+      vendor, frequency, bill_date, amount, is_fixed_expense,
+      general_amount, account_charged, autopay
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.run(
+    sql,
+    [
+      vendor,
+      frequency,
+      bill_date,
+      amount || null,
+      is_fixed_expense ? 1 : 0,
+      general_amount || null,
+      account_charged,
+      autopay ? 1 : 0
+    ],
+    function (err) {
+      if (err) {
+        console.error("Error creating automatic payment:", err);
+        res.status(500).json({ error: "Failed to create automatic payment" });
+      } else {
+        res.status(201).json({ 
+          id: this.lastID,
+          vendor,
+          frequency,
+          bill_date,
+          amount,
+          is_fixed_expense,
+          general_amount,
+          account_charged,
+          autopay
+        });
+      }
+    }
+  );
+});
+
+// PUT update an automatic payment
+app.put("/api/automatic-payments/:id", (req, res) => {
+  const { id } = req.params;
+  const {
+    vendor,
+    frequency,
+    bill_date,
+    amount,
+    is_fixed_expense,
+    general_amount,
+    account_charged,
+    autopay
+  } = req.body;
+
+  if (!vendor || !frequency || !bill_date || !account_charged) {
+    return res.status(400).json({ 
+      error: "Vendor, frequency, bill date, and account charged are required." 
+    });
+  }
+
+  const sql = `
+    UPDATE automatic_payments SET
+      vendor = ?,
+      frequency = ?,
+      bill_date = ?,
+      amount = ?,
+      is_fixed_expense = ?,
+      general_amount = ?,
+      account_charged = ?,
+      autopay = ?
+    WHERE id = ?
+  `;
+
+  db.run(
+    sql,
+    [
+      vendor,
+      frequency,
+      bill_date,
+      amount || null,
+      is_fixed_expense ? 1 : 0,
+      general_amount || null,
+      account_charged,
+      autopay ? 1 : 0,
+      id
+    ],
+    function (err) {
+      if (err) {
+        console.error("Error updating automatic payment:", err);
+        res.status(500).json({ error: "Failed to update automatic payment" });
+      } else {
+        res.json({
+          id,
+          vendor,
+          frequency,
+          bill_date,
+          amount,
+          is_fixed_expense,
+          general_amount,
+          account_charged,
+          autopay
+        });
+      }
+    }
+  );
+});
+
+// DELETE an automatic payment
+app.delete("/api/automatic-payments/:id", (req, res) => {
+  const { id } = req.params;
+  const sql = `DELETE FROM automatic_payments WHERE id = ?`;
+
+  db.run(sql, [id], function (err) {
+    if (err) {
+      console.error("Error deleting automatic payment:", err);
+      res.status(500).json({ error: "Failed to delete automatic payment" });
+    } else {
+      res.status(204).send();
+    }
+  });
+});
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);

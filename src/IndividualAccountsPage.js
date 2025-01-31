@@ -292,22 +292,23 @@ function IndividualAccountsPage() {
       {/* Modal for Account Transactions */}
       {showModal && selectedAccount && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-auto">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[80vh]"> {/* Added max-h-[80vh] */}
             <h3 className="text-xl font-bold mb-4">
               Transactions for {selectedAccount.name}
             </h3>
-            {/* Transactions Table */}
-            <table className="min-w-full bg-white shadow-md rounded">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b">Date</th>
-                  <th className="py-2 px-4 border-b">Vendor</th>
-                  <th className="py-2 px-4 border-b">Amount ($)</th>
-                  <th className="py-2 px-4 border-b">Description</th>
-                  <th className="py-2 px-4 border-b">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+            {/* Add a wrapper div with overflow properties */}
+            <div className="overflow-y-auto max-h-[60vh]"> {/* Added wrapper div */}
+              <table className="min-w-full bg-white shadow-md rounded">
+                <thead className="sticky top-0 bg-white"> {/* Made header sticky */}
+                  <tr>
+                    <th className="py-2 px-4 border-b">Date</th>
+                    <th className="py-2 px-4 border-b">Vendor</th>
+                    <th className="py-2 px-4 border-b">Amount ($)</th>
+                    <th className="py-2 px-4 border-b">Description</th>
+                    <th className="py-2 px-4 border-b">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
                 {transactions.map((transaction) => (
                   <tr key={transaction.id}>
                     <td className="py-2 px-4 border-b">
@@ -342,22 +343,25 @@ function IndividualAccountsPage() {
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
 
-            {/* Delete Account Button */}
-            <button
-              onClick={() => handleDeleteAccount(selectedAccount.id)}
-              className="bg-red-500 text-white px-4 py-2 rounded mt-4"
-            >
-              Delete Account
-            </button>
-            <button
-              onClick={handleCloseModal}
-              className="bg-gray-500 text-white px-4 py-2 rounded mt-4 ml-2"
-            >
-              Close
-            </button>
+            {/* Delete Account and Close buttons */}
+            <div className="mt-4"> {/* Added wrapper for buttons */}
+              <button
+                onClick={() => handleDeleteAccount(selectedAccount.id)}
+                className="bg-red-500 text-white px-4 py-2 rounded"
+              >
+                Delete Account
+              </button>
+              <button
+                onClick={handleCloseModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

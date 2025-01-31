@@ -14,6 +14,7 @@ import AllExpensesPage from "./AllExpensesPage";
 import IndividualAccountsPage from "./IndividualAccountsPage";
 import SubscriptionsManagement from "./SubscriptionsManagement";
 import AnnualBudget from "./AnnualBudget";
+import AutomaticPayments from "./AutomaticPayments";
 import Login from "./Login";
 import "./index.css";
 
@@ -81,6 +82,7 @@ function App() {
       "Dogs",
       "Reza",
       "Arya",
+      "Business expense",
       "Other, see notes",
     ],
     'Non-Essentials': [
@@ -283,6 +285,9 @@ function App() {
                 <Link to="/annual-budget" className="text-gray-600 hover:text-gray-900 px-3 py-2">
                   Annual Budget
                 </Link>
+                <Link to="/automatic-payments" className="text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Automatic Payments
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="text-gray-600 hover:text-gray-900 px-3 py-2"
@@ -324,6 +329,9 @@ function App() {
                 </Link>
                 <Link to="/annual-budget" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
                   Annual Budget
+                </Link>
+                <Link to="/automatic-payments" className="block text-gray-600 hover:text-gray-900 px-3 py-2">
+                  Automatic Payments
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -479,6 +487,10 @@ function App() {
               <Route
                 path="/annual-budget"
                 element={<AnnualBudget />}
+              />
+              <Route
+                path="/automatic-payments"
+                element={<AutomaticPayments />}
               />
             </>
           )}
