@@ -10,8 +10,6 @@ const api = axios.create({
 const AutomaticPayments = () => {
   const [payments, setPayments] = useState([]);
   const [accounts, setAccounts] = useState([]);
-  const [creditCards, setCreditCards] = useState([]);
-  const [isCustomAccount, setIsCustomAccount] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
   const [formData, setFormData] = useState({
@@ -30,13 +28,12 @@ const AutomaticPayments = () => {
     const fetchData = async () => {
       try {
         const [paymentsRes, accountsRes, creditCardsRes] = await Promise.all([
-          api.get('api/automatic-payments'),
-          api.get('api/accounts'),
-          api.get('api/credit-cards')
+          axios.get('/api/automatic-payments'),
+          axios.get('/api/accounts'),
+          axios.get('/api/credit-cards')
         ]);
         setPayments(paymentsRes.data);
         setAccounts(accountsRes.data);
-        setCreditCards(creditCardsRes.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -163,67 +160,20 @@ const AutomaticPayments = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Account Charged</label>
-              <div className="mt-1 space-y-2">
-                <select
-                  name="account_charged"
-                  value={isCustomAccount ? "" : formData.account_charged}
-                  onChange={(e) => {
-                    if (e.target.value === "custom") {
-                      setIsCustomAccount(true);
-                      setFormData(prev => ({ ...prev, account_charged: "" }));
-                    } else {
-                      setIsCustomAccount(false);
-                      handleInputChange(e);
-                    }
-                  }}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  required={!isCustomAccount}
-                  disabled={isCustomAccount}
-                >
-                  <option value="">Select Account or Card</option>
-                  <optgroup label="Bank Accounts">
-                    {accounts.map(account => (
-                      <option key={`account-${account.id}`} value={account.name}>
-                        {account.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Credit Cards">
-                    {creditCards.map(card => (
-                      <option key={`card-${card.id}`} value={`${card.issuer} ${card.type} (*${card.lastFourDigits})`}>
-                        {card.issuer} {card.type} (*{card.lastFourDigits})
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Other">
-                    <option value="custom">Enter Custom Account</option>
-                  </optgroup>
-                </select>
-                
-                {isCustomAccount && (
-                  <div>
-                    <input
-                      type="text"
-                      name="account_charged"
-                      value={formData.account_charged}
-                      onChange={handleInputChange}
-                      placeholder="Enter account name"
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsCustomAccount(false);
-                        setFormData(prev => ({ ...prev, account_charged: "" }));
-                      }}
-                      className="mt-1 text-sm text-blue-600 hover:text-blue-800"
-                    >
-                      Back to selection
-                    </button>
-                  </div>
-                )}
-              </div>
+              <select
+                name="account_charged"
+                value={formData.account_charged}
+                onChange={handleInputChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              >
+                <option value="">Select Account</option>
+                {accounts.map(account => (
+                  <option key={account.id} value={account.name}>
+                    {account.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="flex items-center space-x-4">
