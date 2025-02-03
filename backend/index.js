@@ -9,7 +9,7 @@ const PORT = 5001;
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://192.168.1.253", "https://192.168.1.253", "http://192.168.1.253:3000", "https://192.168.1.253:3000"], // Allow all needed origins
+    origin: ["http://192.168.1.253"], // Only allow frontend origin, removed the port since it's being served on port 80.
     credentials: true,
   })
 );
@@ -242,7 +242,8 @@ app.post("/api/logout", (req, res) => {
   res.json({ message: "Logged out successfully" });
 });
 // Check if the user is authenticated
-app.get("/check-auth", (req, res) => {
+app.get("/api/check-auth", (req, res) => {
+  console.log("Request Origin:", req.headers.origin)
   if (req.session && req.session.userId) {
     res.json({ isAuthenticated: true });
   } else {
@@ -928,8 +929,8 @@ app.post("/api/automatic-payments", async (req, res) => {
 
   try {
     if (!vendor || !frequency || !bill_date || !account_charged) {
-      return res.status(400).json({ 
-        error: "Vendor, frequency, bill date, and account charged are required." 
+      return res.status(400).json({
+        error: "Vendor, frequency, bill date, and account charged are required."
       });
     }
 
@@ -957,7 +958,7 @@ app.post("/api/automatic-payments", async (req, res) => {
           console.error("Error creating automatic payment:", err);
           res.status(500).json({ error: "Failed to create automatic payment" });
         } else {
-          res.status(201).json({ 
+          res.status(201).json({
             id: this.lastID,
             vendor,
             frequency,
@@ -993,8 +994,8 @@ app.put("/api/automatic-payments/:id", async (req, res) => {
 
   try {
     if (!vendor || !frequency || !bill_date || !account_charged) {
-      return res.status(400).json({ 
-        error: "Vendor, frequency, bill date, and account charged are required." 
+      return res.status(400).json({
+        error: "Vendor, frequency, bill date, and account charged are required."
       });
     }
 

@@ -1,5 +1,5 @@
 // Login.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -26,6 +26,7 @@ function Login({ setIsAuthenticated }) {
       setError(err.response?.data?.error || "An error occurred");
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
