@@ -10,6 +10,8 @@ const api = axios.create({
 const AutomaticPayments = () => {
   const [payments, setPayments] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  // Add a state variable to track whether a custom value is selected
+  const [useCustomAccount, setUseCustomAccount] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
   const [formData, setFormData] = useState({
@@ -20,16 +22,17 @@ const AutomaticPayments = () => {
     is_fixed_expense: false,
     general_amount: '',
     account_charged: '',
-    autopay: false
+    // new field for custom value if "Other" is selected
+    custom_account: '',
+    autopay: false,
   });
 
-  // Fetch automatic payments and accounts
+  // Fetch automatic payments and credit cards data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [paymentsRes, accountsRes, creditCardsRes] = await Promise.all([
+        const [paymentsRes, accountsRes] = await Promise.all([
           axios.get('/api/automatic-payments'),
-          axios.get('/api/accounts'),
           axios.get('/api/credit-cards')
         ]);
         setPayments(paymentsRes.data);
@@ -43,9 +46,42 @@ const AutomaticPayments = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+
+    // if the account charged is changed and the user selects "custom",
+    // set the useCustomAccount flag to true
+    if (name === 'account_charged') {
+      if (value === 'custom') {
+        setUseCustomAccount(true);
+        // clear the current value of custom_account to let the user enter a new one
+        setFormData((prev) => ({
+          ...prev,
+          custom_account: '',
+          account_charged: ''
+        }));
+      } else {
+        setUseCustomAccount(false);
+        setFormData((prev) => ({
+          ...prev,
+          account_charged: value,
+          // clear any custom entry value
+          custom_account: ''
+        }));
+      }
+      return;
+    }
+
+    setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleCustomInputChange = (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      custom_account: value,
+      account_charged: value, // propagate custom value to account_charged field
     }));
   };
 
@@ -53,15 +89,15 @@ const AutomaticPayments = () => {
     e.preventDefault();
     try {
       if (isEditing) {
-        await api.put(`api/automatic-payments/${editingPayment.id}`, formData);
+        await api.put(`/api/automatic-payments/${editingPayment.id}`, formData);
       } else {
-        await api.post('api/automatic-payments', formData);
+        await api.post('/api/automatic-payments', formData);
       }
-      
+
       // Refresh payments list
-      const response = await api.get('api/automatic-payments');
+      const response = await api.get('/api/automatic-payments');
       setPayments(response.data);
-      
+
       // Reset form
       setFormData({
         vendor: '',
@@ -71,8 +107,10 @@ const AutomaticPayments = () => {
         is_fixed_expense: false,
         general_amount: '',
         account_charged: '',
-        autopay: false
+        custom_account: '',
+        autopay: false,
       });
+      setUseCustomAccount(false);
       setIsEditing(false);
       setEditingPayment(null);
     } catch (error) {
@@ -83,6 +121,15 @@ const AutomaticPayments = () => {
   const handleEdit = (payment) => {
     setIsEditing(true);
     setEditingPayment(payment);
+    // Check whether the saved account_charged value originated from a custom entry.
+    // For simplicity, assume that if it doesn’t match any of the accounts then it’s custom.
+    const isCustom = !accounts.find(
+      (acc) =>
+        (acc.nickname || `${acc.issuer} ****${acc.lastFourDigits}`) ===
+        payment.account_charged
+    );
+
+    setUseCustomAccount(isCustom);
     setFormData({
       vendor: payment.vendor,
       frequency: payment.frequency,
@@ -90,7 +137,8 @@ const AutomaticPayments = () => {
       amount: payment.amount || '',
       is_fixed_expense: Boolean(payment.is_fixed_expense),
       general_amount: payment.general_amount || '',
-      account_charged: payment.account_charged,
+      account_charged: isCustom ? '' : payment.account_charged,
+      custom_account: isCustom ? payment.account_charged : '',
       autopay: Boolean(payment.autopay)
     });
   };
@@ -98,7 +146,7 @@ const AutomaticPayments = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this automatic payment?')) {
       try {
-        await api.delete(`api/automatic-payments/${id}`);
+        await api.delete(`/api/automatic-payments/${id}`);
         setPayments(payments.filter(payment => payment.id !== id));
       } catch (error) {
         console.error('Error deleting payment:', error);
@@ -109,7 +157,7 @@ const AutomaticPayments = () => {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-8">Automatic Payments</h1>
-      
+
       {/* Add/Edit Form */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">
@@ -118,7 +166,9 @@ const AutomaticPayments = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Vendor</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Vendor
+              </label>
               <input
                 type="text"
                 name="vendor"
@@ -128,9 +178,11 @@ const AutomaticPayments = () => {
                 required
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700">Frequency</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Frequency
+              </label>
               <select
                 name="frequency"
                 value={formData.frequency}
@@ -147,7 +199,9 @@ const AutomaticPayments = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Bill Date</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Bill Date
+              </label>
               <input
                 type="date"
                 name="bill_date"
@@ -159,26 +213,47 @@ const AutomaticPayments = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Account Charged</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Account Charged
+              </label>
               <select
                 name="account_charged"
-                value={formData.account_charged}
+                value={useCustomAccount ? 'custom' : formData.account_charged}
                 onChange={handleInputChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                required
+                required={!useCustomAccount}
               >
                 <option value="">Select Account</option>
-                {accounts.map(account => (
-                  <option key={account.id} value={account.name}>
-                    {account.name}
-                  </option>
-                ))}
+                {accounts.map((account) => {
+                  const displayName =
+                    account.nickname || `${account.issuer} ****${account.lastFourDigits}`;
+                  return (
+                    <option key={account.id} value={displayName}>
+                      {displayName}
+                    </option>
+                  );
+                })}
+                <option value="custom">Other (Custom)</option>
               </select>
+
+              {useCustomAccount && (
+                <input
+                  type="text"
+                  name="custom_account"
+                  placeholder="Enter custom account"
+                  value={formData.custom_account}
+                  onChange={handleCustomInputChange}
+                  className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  required
+                />
+              )}
             </div>
 
             <div className="flex items-center space-x-4">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700">Amount</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Amount
+                </label>
                 <input
                   type="number"
                   name="amount"
@@ -196,19 +271,23 @@ const AutomaticPayments = () => {
                   onChange={handleInputChange}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label className="ml-2 block text-sm text-gray-700">Fixed Amount</label>
+                <label className="ml-2 block text-sm text-gray-700">
+                  Fixed Amount
+                </label>
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">General Amount</label>
+              <label className="block text-sm font-medium text-gray-700">
+                General Amount
+              </label>
               <input
                 type="text"
                 name="general_amount"
                 value={formData.general_amount}
                 onChange={handleInputChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 placeholder="e.g., $50-100"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 disabled={formData.is_fixed_expense}
               />
             </div>
@@ -222,7 +301,9 @@ const AutomaticPayments = () => {
               onChange={handleInputChange}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label className="ml-2 block text-sm text-gray-700">Automatic Payment Enabled</label>
+            <label className="ml-2 block text-sm text-gray-700">
+              Automatic Payment Enabled
+            </label>
           </div>
 
           <div className="flex justify-end space-x-3">
@@ -240,8 +321,10 @@ const AutomaticPayments = () => {
                     is_fixed_expense: false,
                     general_amount: '',
                     account_charged: '',
+                    custom_account: '',
                     autopay: false
                   });
+                  setUseCustomAccount(false);
                 }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
               >
@@ -263,27 +346,49 @@ const AutomaticPayments = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Frequency</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bill Date</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Autopay</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Vendor
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Frequency
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Bill Date
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Amount
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Account
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Autopay
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {payments.map((payment) => (
               <tr key={payment.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.vendor}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.frequency}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.bill_date}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {payment.is_fixed_expense ? 
-                    `$${payment.amount}` : 
-                    payment.general_amount}
+                  {payment.vendor}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{payment.account_charged}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {payment.frequency}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {payment.bill_date}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {payment.is_fixed_expense
+                    ? `$${payment.amount}`
+                    : payment.general_amount}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {payment.account_charged}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {payment.autopay ? 'Yes' : 'No'}
                 </td>

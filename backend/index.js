@@ -5,14 +5,33 @@ const bodyParser = require("body-parser");
 const session = require("express-session"); // Add this
 const bcrypt = require("bcrypt"); // Add this
 const app = express();
-const PORT = 5001;
+const PORT = process.env.PORT || 5001;
 
-app.use(
-  cors({
-    origin: ["http://192.168.1.253"], // Only allow frontend origin, removed the port since it's being served on port 80.
-    credentials: true,
-  })
-);
+// Add CORS configuration so local development can be use along with production
+const corsOptions = {
+  origin: function(origin, callback) {
+    console.log('Incoming request from origin:', origin);
+    
+    const allowedOrigins = [
+      "http://192.168.1.253",     // Production
+      "http://localhost:3000",     // Local development
+      "http://0.0.0.0:3000"       // Alternative local development
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT, DELETE, OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+// CORS configuration
+app.use(cors(corsOptions));
 
 console.log("Session secret:", process.env.SESSION_SECRET);
 app.use(bodyParser.json());
