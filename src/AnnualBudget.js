@@ -32,7 +32,7 @@ function AnnualBudget() {
               subcategories: {},
             };
           }
-          
+
           processedData[category].annualBudget += amount * 12; // Monthly budget * 12 for annual
           if (!processedData[category].subcategories[subcategory]) {
             processedData[category].subcategories[subcategory] = {
@@ -49,15 +49,16 @@ function AnnualBudget() {
           if (processedData[category]) {
             processedData[category].ytdSpent += amount;
             if (processedData[category].subcategories[subcategory]) {
-              processedData[category].subcategories[subcategory].ytdSpent += amount;
+              processedData[category].subcategories[subcategory].ytdSpent +=
+                amount;
             }
           }
         });
 
         // Convert to array format for rendering
-        const formattedData = Object.values(processedData).map(category => ({
+        const formattedData = Object.values(processedData).map((category) => ({
           ...category,
-          subcategories: Object.values(category.subcategories)
+          subcategories: Object.values(category.subcategories),
         }));
 
         setAnnualData(formattedData);
@@ -72,7 +73,9 @@ function AnnualBudget() {
   }, [currentYear]);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">Loading...</div>
+    );
   }
 
   const calculateTotals = () => {
@@ -89,14 +92,20 @@ function AnnualBudget() {
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
-      <h2 className="text-2xl font-bold mb-6">Annual Budget Summary {currentYear}</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        Annual Budget Summary {currentYear}
+      </h2>
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white shadow-md rounded">
           <thead>
             <tr className="bg-gray-50">
-              <th className="py-3 px-4 border-b text-left">Category/Subcategory</th>
-              <th className="py-3 px-4 border-b text-right">Annual Budget ($)</th>
+              <th className="py-3 px-4 border-b text-left">
+                Category/Subcategory
+              </th>
+              <th className="py-3 px-4 border-b text-right">
+                Annual Budget ($)
+              </th>
               <th className="py-3 px-4 border-b text-right">YTD Spent ($)</th>
               <th className="py-3 px-4 border-b text-right">Remaining ($)</th>
               <th className="py-3 px-4 border-b text-right">% Used</th>
@@ -119,7 +128,10 @@ function AnnualBudget() {
                     {(category.annualBudget - category.ytdSpent).toFixed(2)}
                   </td>
                   <td className="py-2 px-4 border-b text-right">
-                    {((category.ytdSpent / category.annualBudget) * 100).toFixed(1)}%
+                    {((category.ytdSpent / category.annualBudget) * 100).toFixed(
+                      1
+                    )}
+                    %
                   </td>
                   <td className="py-2 px-4 border-b">
                     {category.ytdSpent <= category.annualBudget ? (
@@ -142,10 +154,14 @@ function AnnualBudget() {
                       {subcategory.ytdSpent.toFixed(2)}
                     </td>
                     <td className="py-2 px-4 border-b text-right">
-                      {(subcategory.annualBudget - subcategory.ytdSpent).toFixed(2)}
+                      {(subcategory.annualBudget - subcategory.ytdSpent).toFixed(
+                        2
+                      )}
                     </td>
                     <td className="py-2 px-4 border-b text-right">
-                      {((subcategory.ytdSpent / subcategory.annualBudget) * 100).toFixed(1)}%
+                      {((subcategory.ytdSpent / subcategory.annualBudget) *
+                        100).toFixed(1)}
+                      %
                     </td>
                     <td className="py-2 px-4 border-b">
                       {subcategory.ytdSpent <= subcategory.annualBudget ? (

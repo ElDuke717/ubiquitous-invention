@@ -87,17 +87,24 @@ const AutomaticPayments = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // If we're in custom account mode, ensure account_charged is populated from custom_account.
+    const payload = {
+      ...formData,
+      account_charged: useCustomAccount ? formData.custom_account : formData.account_charged,
+    };
+  
     try {
       if (isEditing) {
-        await api.put(`/api/automatic-payments/${editingPayment.id}`, formData);
+        await api.put(`/api/automatic-payments/${editingPayment.id}`, payload);
       } else {
-        await api.post('/api/automatic-payments', formData);
+        await api.post('/api/automatic-payments', payload);
       }
-
+  
       // Refresh payments list
       const response = await api.get('/api/automatic-payments');
       setPayments(response.data);
-
+  
       // Reset form
       setFormData({
         vendor: '',
@@ -117,6 +124,7 @@ const AutomaticPayments = () => {
       console.error('Error saving payment:', error);
     }
   };
+  
 
   const handleEdit = (payment) => {
     setIsEditing(true);
@@ -341,9 +349,8 @@ const AutomaticPayments = () => {
         </form>
       </div>
 
-      {/* Payments Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="bg-white rounded-lg shadow-md overflow-x-auto">
+        <table className="min-w-full table-auto divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -364,7 +371,7 @@ const AutomaticPayments = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Autopay
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th style={{ minWidth: "150px" }} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -372,27 +379,25 @@ const AutomaticPayments = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {payments.map((payment) => (
               <tr key={payment.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4">
                   {payment.vendor}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4">
                   {payment.frequency}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4">
                   {payment.bill_date}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {payment.is_fixed_expense
-                    ? `$${payment.amount}`
-                    : payment.general_amount}
+                <td className="px-6 py-4">
+                  {payment.is_fixed_expense ? `$${payment.amount}` : payment.general_amount}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4">
                   {payment.account_charged}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4">
                   {payment.autopay ? 'Yes' : 'No'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td className="px-6 py-4 text-sm font-medium">
                   <button
                     onClick={() => handleEdit(payment)}
                     className="text-indigo-600 hover:text-indigo-900 mr-4"
