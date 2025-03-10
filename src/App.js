@@ -150,9 +150,13 @@ function App() {
         })
         .catch((error) => console.error(error));
 
-      // Fetch actual expenses
+      // Fetch actual expenses for current month
+      const now = new Date();
+      const currentMonth = (now.getMonth() + 1).toString(); // getMonth() returns 0-11
+      const currentYear = now.getFullYear().toString();
+      
       api
-        .get("/api/individual-expenses")
+        .get(`/api/individual-expenses?month=${currentMonth}&year=${currentYear}`)
         .then((response) => {
           const fetchedActualExpenses = response.data;
           const actualExpensesByCategory = {};
