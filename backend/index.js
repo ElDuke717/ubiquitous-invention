@@ -13,9 +13,10 @@ const corsOptions = {
     console.log('Incoming request from origin:', origin);
     
     const allowedOrigins = [
-      "http://192.168.1.253",     // Production
-      "http://localhost:3000",     // Local development
-      "http://0.0.0.0:3000"       // Alternative local development
+      "http://192.168.1.253",
+      "http://192.168.1.253:80",
+      "http://localhost:3000",
+      "http://0.0.0.0:3000"
     ];
     
     if (!origin || allowedOrigins.includes(origin)) {
@@ -26,7 +27,7 @@ const corsOptions = {
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT, DELETE, OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Fixed the syntax error here
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
@@ -41,9 +42,15 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Set to true if using HTTPS
+    cookie: { 
+      secure: false,
+      sameSite: 'lax',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   })
 );
+
 
 const db = require("./database");
 
